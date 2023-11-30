@@ -1,10 +1,14 @@
-
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const helmet = require('helmet');
 const cors = require('cors');
+
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
+
+// MongoDB Connection URL
+const url = "mongodb+srv://ericduan12:WingyiKelly@cluster0.brvp9xz.mongodb.net/?retryWrites=true&w=majority";
+const dbName = 'pj3';
 
 // Use CORS for all routes
 app.use(cors());
@@ -15,7 +19,7 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "http://localhost:3001", "data:"],
+      imgSrc: ["'self'", "data:"],
     },
   })
 );
@@ -23,23 +27,23 @@ app.use(
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-const MongoClient = require('mongodb').MongoClient;
-const mongoUrl = "mongodb+srv://ericduan12:WingyiKelly@cluster0.brvp9xz.mongodb.net/?retryWrites=true&w=majority"
+app.use(express.json());
 
-const dbName = 'pj3';
+// Root Route
+app.get('/', (req, res) => {
+  res.send('Welcome to my Node.js app on Heroku!');
+});
 
 async function main() {
   let client;
-  
+
   try {
     // Connect to the MongoDB client
-    client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+    client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
     
     const db = client.db(dbName);
     const productsCollection = db.collection('product');
     const ordersCollection = db.collection('order');
-
-    app.use(express.json());
 
     // Products Route
     app.get('/api/products', async (req, res) => {
@@ -55,14 +59,13 @@ async function main() {
     // Orders Route
     app.get('/api/orders', async (req, res) => {
       try {
-        const orders = await ordersCollection.find({}).sort({ orderDate: -1 }).toArray(); // Sort by orderDate descending
+        const orders = await ordersCollection.find({}).sort({ orderDate: -1 }).toArray();
         res.json(orders);
       } catch (err) {
         console.error(err);
         res.status(500).send('Error fetching orders');
       }
     });
-    
 
     // Route to handle creation of a new order
     app.post('/api/orders', async (req, res) => {
@@ -85,14 +88,15 @@ async function main() {
       }
     });
 
-    // Start the server
-    app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
-    });
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
   }
 }
 
 main().catch(console.error);
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
