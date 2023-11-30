@@ -1,25 +1,22 @@
-
 {
-      "name": "helloapp",
-      "version": "1.0.0",
-      "description": "node app ",
-      "main": "server1.js",
-      "scripts": {
-      "start": "node server1.js"
-    },
-      
-      "dependencies": {
-      "express": "^4.17.1",
-
-    },
-      "repository": {
-      "type": "git",
-      "url": ""
-    },
-      "author": "",
-      "license": "ISC",
-      "bugs": {
-      "url": ""
-    },
-      "homepage": ""
-    }
+  "name": "helloapp",
+  "version": "1.0.0",
+  "description": "node app",
+  "main": "server1.js",
+  "scripts": {
+    "start": "node server1.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}
