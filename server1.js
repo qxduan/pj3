@@ -4,11 +4,7 @@ const { MongoClient } = require('mongodb');
 const helmet = require('helmet');
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3001;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
+const port = 3001;
 
 // Use CORS for all routes
 app.use(cors());
@@ -27,8 +23,9 @@ app.use(
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-// Use environment variable for MongoDB URI
-const mongoUrl = process.env.MONGO_URI;
+const MongoClient = require('mongodb').MongoClient;
+const mongoUrl = "mongodb+srv://ericduan12:WingyiKelly@cluster0.brvp9xz.mongodb.net/?retryWrites=true&w=majority"
+
 const dbName = 'pj3';
 
 async function main() {
@@ -43,13 +40,6 @@ async function main() {
     const ordersCollection = db.collection('order');
 
     app.use(express.json());
-
-
-
-
-    app.get('/', (req, res) => {
-      res.send('Welcome to my Node.js app on Heroku!');
-    });
 
     // Products Route
     app.get('/api/products', async (req, res) => {
@@ -95,10 +85,14 @@ async function main() {
       }
     });
 
-
+    // Start the server
+    app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
   }
 }
 
 main().catch(console.error);
+
