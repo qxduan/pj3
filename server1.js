@@ -32,7 +32,7 @@ app.use(express.json());
 
 // Root Route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'page1_new.html'));
 });
 
 async function main() {
