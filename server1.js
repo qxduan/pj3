@@ -44,6 +44,13 @@ async function main() {
 
     app.use(express.json());
 
+
+
+
+    app.get('/', (req, res) => {
+      res.send('Welcome to my Node.js app on Heroku!');
+    });
+
     // Products Route
     app.get('/api/products', async (req, res) => {
       try {
