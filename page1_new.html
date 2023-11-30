@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Catalog</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<div id="product-container"></div>
+
+<button class="btn view-cart" onclick="viewCart()">View Cart</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('http://localhost:3001/api/products')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(products => {
+            const productContainer = document.getElementById('product-container');
+            products.forEach(product => { 
+                const productElement = document.createElement('div');
+                productElement.className = 'product';
+                productElement.innerHTML = `
+                    <img src="${product.image_url}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <h3 class="name">${product.name}</h3>
+                        <p class="price">$${product.price}</p>
+                        <div class="product-quantity-select">
+                            <label for="quantity-${product.id}">Quantity:</label>
+                            <select id="quantity-${product.id}" name="quantity">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn add-to-cart">Add to Cart</button>
+                        <button class="btn more-info" onclick="toggleDescription(this)">More</button>
+                    </div>
+                    <div class="description" style="display: none;">
+                        <p>${product.description}</p>
+                    </div>
+                `;
+                productContainer.appendChild(productElement);
+
+                // Set up the click event for 'Add to Cart' button
+                const addToCartButton = productElement.querySelector('.btn.add-to-cart');
+                addToCartButton.addEventListener('click', function() {
+                    addCart(product);
+                });
+            });
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+});
+
+function toggleDescription(button) {
+    const productDescription = button.closest('.product').querySelector('.description');
+    productDescription.style.display = productDescription.style.display === 'none' ? 'block' : 'none';
+}
+
+function addCart(product) {
+    const quantitySelect = document.getElementById(`quantity-${product.id}`);
+    const quantity = parseInt(quantitySelect.value);
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    let productInCart = cart.find(item => item.id === product.id);
+    
+    if (productInCart) {
+        productInCart.quantity += quantity;
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: quantity
+        });
+    }
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    alert(`Added ${quantity} ${quantity > 1 ? 'units' : 'unit'} of ${product.name} to the cart.`);
+}
+
+function viewCart() {
+    window.location.href = 'page2_new.html'; // Redirect to the cart page
+}
+</script>
+
+</body>
+</html>

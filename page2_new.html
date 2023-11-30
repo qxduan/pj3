@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+ 
+</head>
+<body>
+
+<h1>Shopping Cart</h1>
+<div id="cart-items"></div>
+<div id="order-total">
+    <span id="total-cost"></span>
+</div>
+<button class="btn" onclick="checkout()">Check Out</button>
+<button class="btn" onclick="continueShopping()">Continue Shopping</button>
+
+<script>
+    function updateCartDisplay() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      cartItemsContainer.innerHTML = ''; // Clear the cart container
+
+      let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+      let totalCost = 0;
+
+      // Create table headers
+      const headerRow = document.createElement('tr');
+      headerRow.innerHTML = `
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+      `;
+      cartItemsContainer.appendChild(headerRow);
+
+      cart.forEach((item, index) => {
+            const subTotal = item.price * item.quantity;
+            totalCost += subTotal;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                  <td>${item.name}</td>
+                  <td>$${item.price.toFixed(2)}</td>
+                  <td>${item.quantity}</td>
+                  <td>$${subTotal.toFixed(2)}</td>
+                  <td><button onclick="removeFromCart(${index})">Remove</button></td>
+            `;
+            cartItemsContainer.appendChild(row);
+      });
+
+      document.getElementById('total-cost').textContent = `Total Cost: $${totalCost.toFixed(2)}`;
+}
+
+
+
+    function removeFromCart(index) {
+        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+        cart.splice(index, 1); // Remove the item at the specified index
+        localStorage.setItem('shoppingCart', JSON.stringify(cart)); // Update local storage
+        updateCartDisplay(); 
+    }
+
+
+
+
+    function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+
+    // Check if the product is already in the cart
+    const existingProduct = cart.find((item) => item.name === product.name);
+
+    if (existingProduct) {
+        // If it exists, update the quantity
+        existingProduct.quantity += product.quantity;
+    } else {
+        // If not, add it to the cart
+        cart.push(product);
+    }
+
+    localStorage.setItem('shoppingCart', JSON.stringify(cart)); // Update local storage
+    updateCartDisplay(); // Update the display
+}
+
+
+function checkout() {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    if (cart.length === 0) {
+        alert('Your cart is empty.');
+        return;
+    }
+
+
+    let totalCost = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    // Prepare order data
+    let shipDate = new Date();
+    shipDate.setDate(shipDate.getDate() + 2); // Set ship date 2 days from now
+    const orderData = {
+        items: cart.map(item => ({ itemId: item.id, quantity: item.quantity })),
+        totalCost: totalCost,
+        orderDate: new Date().toISOString(),
+        shipDate: shipDate.toISOString()
+    };
+
+    // Send the order data to the server
+    fetch('http://localhost:3001/api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        // Assume success and redirect to thank you page
+        console.log('Order successful:', data);
+        localStorage.removeItem('shoppingCart'); // Clear the cart
+        window.location.href = `thankyou.html?total=${totalCost.toFixed(2)}`;
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        localStorage.removeItem('shoppingCart'); 
+        window.location.href = `thankyou.html?total=${totalCost.toFixed(2)}`;
+    });
+}
+
+
+
+    function continueShopping() {
+        window.location.href = 'page1_new.html'; 
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCartDisplay);
+
+</script>
+
+</body>
+</html>

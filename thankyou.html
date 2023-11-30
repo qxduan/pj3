@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thank You</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <h1>Thank you for your order!</h1>
+    <p id="order-details"></p>
+    <a href="page2_new.html" id="continue-shopping">Back to Cart</a>
+
+    <p id="order-details"></p>
+    <a href="orders.html" id="view-orders">View All Orders</a>
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                total: params.get('total'),
+                shipDate: new Date(new Date().setDate(new Date().getDate() + 2))
+            };
+        }
+
+        function displayOrderDetails() {
+            const { total, shipDate } = getQueryParams();
+            const orderTotal = parseFloat(total);  
+
+            // Check if the order total is a valid number
+            if (!isNaN(orderTotal)) {
+                // Format and display the order total and ship date
+                document.getElementById('order-details').textContent = `Your order total is $${orderTotal.toFixed(2)}. Expected ship date is ${shipDate.toLocaleDateString()}.`;
+            } else {
+                // If the total is not a valid number, show an error message
+                document.getElementById('order-details').textContent = "There was an error with your order total.";
+            }
+        }
+
+        function clearCartAndSaveOrder(total, shipDate) {
+            // Placeholder functions to represent backend operations.
+            console.log("Clearing cart...");
+            console.log("Saving order to database with total: $" + total + " and ship date: " + shipDate.toLocaleDateString());
+            // After these operations, the backend would redirect to the thank you page.
+        }
+
+        document.addEventListener('DOMContentLoaded', displayOrderDetails);
+    </script>
+
+</body>
+</html>
