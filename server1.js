@@ -31,7 +31,7 @@ app.use(express.json());
 
 // Root Route
 app.get('/', (req, res) => {
-  res.send('Welcome to my Node.js app on Heroku!');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 async function main() {
